@@ -1,0 +1,92 @@
+import numpy as np
+import tkinter as tk
+from tkinter import ttk
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+# Encapsulation: Wrapping data (attributes) and methods (functions) into a single unit (class).
+class PlotApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Matplotlib chart in Tkinter")
+        self.geometry("800x500")
+
+        # Create a PlotFrame and pack it into the main window
+        self.plot_frame = PlotFrame(self)
+        self.plot_frame.pack(fill=tk.BOTH, expand=True)
+
+# Abstraction: Hiding complex implementation details and exposing only the necessary parts.
+class PlotFrame(tk.Frame):
+    def __init__(self, parent):
+        super().__init__(parent)
+        
+        # Create a Matplotlib figure and axes
+        self.figure = Figure(figsize=(5,4), dpi=100)
+        self.ax = self.figure.add_subplot(111)
+
+        # Create a FigureCanvasTkAgg widget
+        self.canvas = FigureCanvasTkAgg(self.figure, self)
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+        # Create a toolbar for the canvas
+        self.toolbar = ttk.Frame(self)
+        self.toolbar.pack(side=tk.BOTTOM, fill=tk.X)
+        
+        # Create a button to update the plot
+        self.update_button = ttk.Button(self.toolbar, text="Update chart", command=self.update_plot)
+        self.update_button.pack(side=tk.LEFT, padx=6, pady=6)
+        
+        
+        # Initial plot
+        self.update_plot()
+
+    # Polymorphism: The method update_plot can behave differently depending on the context.
+    def update_plot(self):
+        # Generate random data
+        x = np.linspace(0, 10, 100)
+        y = np.cos(x) + np.random.normal(0, 0.2, x.size)
+        
+        # Clear the previous plot
+        self.ax.clear()
+        
+        # Plot the data
+        self.ax.plot(x, y, label="Random data")
+        
+        # Add a legend
+        self.ax.legend()
+        
+        # Refresh the canvas
+        self.canvas.draw()
+
+# Inheritance: PlotFrame inherits from tk.Frame, and CustomPlotFrame inherits from PlotFrame.
+class CustomPlotFrame(PlotFrame):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+    # Polymorphism: Overriding the update_plot method to change its behavior.
+    def update_plot(self):
+        # Generate different random data
+        x = np.linspace(0, 10, 100)
+        y = np.cos(x) + np.random.normal(0, 0.1, x.size)
+        
+        # Clear the previous plot
+        self.ax.clear()
+        
+        # Plot the data
+        self.ax.plot(x, y, label="Random data", color='green')
+        
+        # Add a legend
+        self.ax.legend()
+        
+        # Refresh the canvas
+        self.canvas.draw()
+
+if __name__ == "__main__":
+    app = PlotApp()
+
+    # Encapsulation: Changing the frame to the custom one using encapsulated data.
+    app.plot_frame.destroy()
+    app.plot_frame = CustomPlotFrame(app)
+    app.plot_frame.pack(fill=tk.BOTH, expand=True)
+
+    app.mainloop()
